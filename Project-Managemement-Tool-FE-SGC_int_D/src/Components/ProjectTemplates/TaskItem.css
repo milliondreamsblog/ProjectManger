@@ -1,0 +1,81 @@
+.templates-task-item{
+    border-bottom: 1px solid var(--color-neutral-200);
+  
+  
+  .task-item:last-child {
+    border-bottom: none;
+  }
+  
+  .task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-4);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .task-header:hover {
+    background-color: var(--color-neutral-50);
+  }
+  
+  .task-header.open {
+    background-color: var(--color-neutral-100);
+  }
+  
+  .task-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-neutral-800);
+  }
+  
+  .task-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+  }
+  
+  .task-duration {
+    font-size: 14px;
+    color: var(--color-neutral-600);
+    background-color: var(--color-neutral-100);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--border-radius-sm);
+  }
+  
+  .chevron-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-1);
+    color: var(--color-neutral-600);
+  }
+  
+  .chevron-icon {
+    transition: transform 0.3s ease;
+  }
+  
+  .chevron-icon.open {
+    transform: rotate(180deg);
+  }
+  
+  .subtasks-container {
+    background-color: var(--color-neutral-50);
+    overflow: hidden;
+    animation: slideDown 0.3s ease-out;
+    gap: 0;
+  }
+}
+  @keyframes slideDown {
+    from {
+      max-height: 0;
+      opacity: 0;
+    }
+    to {
+      max-height: 500px;
+      opacity: 1;
+    }
+  }
