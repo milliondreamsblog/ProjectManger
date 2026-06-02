@@ -1,0 +1,6 @@
+.project-page-container{
+  height: 90vh;
+  overflow-y: scroll;
+  padding: 20px 30px;
+  flex: 1;
+}
