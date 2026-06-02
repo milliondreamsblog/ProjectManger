@@ -1,0 +1,60 @@
+# Render Blueprint — deploys the backend API as a free web service.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Usage: in the Render dashboard → "New +" → "Blueprint" → pick this repo.
+# Render reads this file, creates the service, and prompts for the secret env
+# vars marked `sync: false` (you paste those in the dashboard, never in git).
+
+services:
+  - type: web
+    name: projectmanager-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    branch: main
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # --- required ---
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true   # Render generates a strong secret automatically
+      - key: NODE_VERSION
+        value: "20"
+      # --- URLs / CORS (set after the frontend is deployed) ---
+      - key: FRONTEND_URL
+        sync: false
+      - key: BACKEND_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      # --- optional integrations (leave blank to disable that feature) ---
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: PUSHER_APP_ID
+        sync: false
+      - key: PUSHER_KEY
+        sync: false
+      - key: PUSHER_SECRET
+        sync: false
+      - key: PUSHER_CLUSTER
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID_C
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET_C
+        sync: false
+      - key: EMAIL_USERS
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
