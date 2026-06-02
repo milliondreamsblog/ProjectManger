@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 const managerRoutes = require("./routes/managerRoutes");
 const cron = require("node-cron");
@@ -99,7 +100,17 @@ app.use("/api/zoho", zohoRoutes);
 app.get('/hello', (req,res)=>{
     console.log('hello world');
     res.json({data: 'welcome to SGC Backend....'});
-}) 
+})
+
+// Lightweight health check for uptime monitors / platform health probes
+// (e.g. Render). Also handy as a keep-alive target to avoid free-tier sleep.
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        uptime: process.uptime(),
+        db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    });
+});
    
 const PORT = process.env.PORT || 5001;
    
