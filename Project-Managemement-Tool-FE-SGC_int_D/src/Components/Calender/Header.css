@@ -1,0 +1,98 @@
+.calender-header-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border-color);
+    height: 64px;
+    /* background-color: yellow; */
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    /* background-color: pink; */
+  }
+  
+  .logo {
+    display: flex;
+    margin-right: 24px;
+    gap: 10px;
+    cursor: pointer;
+  }
+  
+  .calendar-icon {
+    font-size: 24px;
+    margin-right: 8px;
+  }
+  
+  .logo-text {
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--text-color);
+  }
+  
+  .header-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .header-actions .btn {
+    margin-right: 12px;
+  }
+  
+  .nav-buttons {
+    display: flex;
+    margin-right: 16px;
+  }
+  
+  .current-date {
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--text-color);
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .view-selector {
+    position: relative;
+  }
+  
+  .view-selector-button {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+  }
+  
+  .dropdown-arrow {
+    font-size: 10px;
+    margin-left: 4px;
+  }
+  
+  .view-options {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    min-width: 120px;
+  }
+  
+  .view-option {
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  
+  .view-option:hover {
+    background-color: var(--secondary-color);
+  }
+  
+  .view-option.active {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+  }
+}
