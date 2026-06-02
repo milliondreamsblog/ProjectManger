@@ -1,0 +1,33 @@
+name: Keep backend awake
+
+# Pings the backend /health endpoint on a schedule so Render's free tier
+# doesn't sleep (and recruiters don't hit a 30–60s cold start).
+#
+# Setup: in GitHub repo → Settings → Secrets and variables → Actions → Variables,
+# add a repository variable:
+#   BACKEND_HEALTH_URL = https://<your-render-url>/health
+# Until that variable is set, this workflow safely no-ops.
+
+on:
+  schedule:
+    - cron: "*/12 * * * *" # every 12 minutes
+  workflow_dispatch: {} # allow manual runs from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          URL="${{ vars.BACKEND_HEALTH_URL }}"
+          if [ -z "$URL" ]; then
+            echo "ℹ️  BACKEND_HEALTH_URL repo variable not set — skipping."
+            echo "    Set it to https://<your-render-url>/health to enable keep-alive."
+            exit 0
+          fi
+          echo "Pinging $URL ..."
+          if curl -fsS --max-time 40 "$URL"; then
+            echo "✅ Backend is awake."
+          else
+            echo "⚠️ Ping did not succeed (backend may be cold-starting)."
+          fi
