@@ -1,0 +1,6 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Update with your deployed domain after going live
+Sitemap: https://projectmanager.vercel.app/sitemap.xml

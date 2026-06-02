@@ -1,0 +1,17 @@
+{
+  "name": "ProjectManager — Team Project & Task Management",
+  "short_name": "ProjectManager",
+  "description": "Role-based project & task management with milestones, audit trails, real-time notifications and analytics.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a73e8",
+  "icons": [
+    {
+      "src": "/SGC-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
