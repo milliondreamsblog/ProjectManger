@@ -96,8 +96,18 @@ Redeploy the backend so the new env vars take effect.
 
 ## ⏰ Note on Render's free tier (cold starts)
 The free backend **sleeps after ~15 min idle**, so the first request after a nap takes
-**30–60s**. Options:
-- **Keep-alive ping** — a free uptime monitor (e.g. UptimeRobot / cron-job.org) hitting
-  `/health` every 10–14 min keeps it warm.
-- **Upgrade** Render to a paid instance (~$7/mo) for always-on.
-- **Accept it** for a low-traffic portfolio demo (add a "first load may take ~30s" note).
+**30–60s**. This repo includes a **keep-alive** solution:
+
+### ✅ Included: GitHub Actions keep-alive
+[`.github/workflows/keepalive.yml`](.github/workflows/keepalive.yml) pings `/health` every 12 min.
+**To enable it:** GitHub repo → **Settings → Secrets and variables → Actions → Variables** →
+add a variable `BACKEND_HEALTH_URL = https://<your-render-url>/health`.
+(Until set, the workflow safely no-ops. You can also trigger it manually from the Actions tab.)
+
+> Note: GitHub disables scheduled workflows after 60 days of repo inactivity — a periodic commit
+> (or the manual "Run workflow" button) re-enables it.
+
+### Alternatives
+- **UptimeRobot / cron-job.org** — a free external monitor hitting `/health` every ~12 min (most
+  reliable; also gives you uptime stats).
+- **Upgrade** Render to a paid instance (~$7/mo) for always-on, no pinging needed.
