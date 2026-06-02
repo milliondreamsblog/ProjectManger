@@ -963,46 +963,65 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
-// Configure Google Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://api.sgc-cloud.com/api/auth/google/callback", // Update this URL to match your backend URL
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        console.log("Google profile:");
-        // Check if user exists with this email
-        const existingUser = await User.findOne({
-          email: profile.emails[0].value,
-        });
-
-        if (!existingUser) {
-          console.log("user is not authorize");
-          return done(null, false, {
-            message: "User not registered in the system",
-          });
-        }
-
-        // If user exists but no Google ID, link the Google ID
-        if (!existingUser.googleId) {
-          existingUser.googleId = profile.id;
-          await existingUser.save();
-        }
-
-        return done(null, existingUser);
-      } catch (error) {
-        return done(error, null);
-      }
-    }
-  )
+// Configure Google Strategy — OPTIONAL.
+// Only register it when credentials are present; otherwise the
+// passport-google-oauth20 constructor throws and crashes boot. This keeps the
+// app runnable with just MONGO_URI + JWT_SECRET (Google login simply disabled).
+const googleAuthEnabled = Boolean(
+  process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
 );
+
+if (googleAuthEnabled) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        // Derived from the backend's public URL (set BACKEND_URL in prod).
+        callbackURL: `${process.env.BACKEND_URL || "http://localhost:5001"}/api/auth/google/callback`,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          // Check if user exists with this email
+          const existingUser = await User.findOne({
+            email: profile.emails[0].value,
+          });
+
+          if (!existingUser) {
+            return done(null, false, {
+              message: "User not registered in the system",
+            });
+          }
+
+          // If user exists but no Google ID, link the Google ID
+          if (!existingUser.googleId) {
+            existingUser.googleId = profile.id;
+            await existingUser.save();
+          }
+
+          return done(null, existingUser);
+        } catch (error) {
+          return done(error, null);
+        }
+      }
+    )
+  );
+} else {
+  console.warn("⚠️  GOOGLE_CLIENT_ID/SECRET not set — Google login disabled.");
+}
+
+// Short-circuit Google routes when the strategy isn't configured.
+const requireGoogleAuth = (req, res, next) => {
+  if (!googleAuthEnabled) {
+    return res.status(503).json({ message: "Google login is not configured on this server." });
+  }
+  next();
+};
 
 // Google login route
 router.get(
   "/google",
+  requireGoogleAuth,
   passport.authenticate("google", {
     scope: ["profile", "email"],
   })
@@ -1011,6 +1030,7 @@ router.get(
 // Google callback route
 router.get(
   "/google/callback",
+  requireGoogleAuth,
   passport.authenticate("google", { session: false }),
   async (req, res) => {
     console.log("enter in google auth");
