@@ -1,0 +1,37 @@
+.task-visualizer-container {
+  max-width: 100%;
+  border-radius: 8px;
+  white-space: nowrap; /* ✅ prevent line breaks */
+}
+
+.graph-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-left: 10px;
+}
+
+.task-visualizer-svg {
+  display: block;
+  max-width: 100%;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+}
+
+.node rect {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.node rect:hover {
+  fill: #f0f9ff;
+}
+
+.node text {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
