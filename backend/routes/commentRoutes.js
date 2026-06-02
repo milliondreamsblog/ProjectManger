@@ -2,34 +2,20 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const Comment = require('../models/Comment');
 const Task = require('../models/Task1');
 const { logActivity } = require("../middlewares/auditLogMiddleware");
 const { sendNotification } = require('../services/notificationService');
 const User = require('../models/User');
-const AWS = require('aws-sdk');
-const s3 = new AWS.S3();
-const s3BucketName = process.env.AWS_S3_BUCKET_NAME;
+const { uploadBufferToCloudinary, deleteFromCloudinary } = require('../utils/cloudinaryUpload');
 
-// Create uploads directory if it doesn't exist (used by Multer disk storage)
-const uploadDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+// ----- (legacy) AWS S3 — replaced by Cloudinary -----
+// const AWS = require('aws-sdk');
+// const s3 = new AWS.S3();
+// const s3BucketName = process.env.AWS_S3_BUCKET_NAME;
 
-// Configure multer for disk storage (temporary local save before uploading to S3)
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-
-const upload = multer({ storage: storage });
+// Multer in-memory storage — buffers stream straight to Cloudinary.
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Add comment to task
 router.post("/add/:taskId", authMiddleware, upload.array('attachments', 5), async (req, res) => {
@@ -47,36 +33,23 @@ router.post("/add/:taskId", authMiddleware, upload.array('attachments', 5), asyn
         const attachments = [];
         if (files && files.length > 0) {
             for (const file of files) {
-                const fileStream = fs.createReadStream(file.path);
-                const uploadParams = {
-                    Bucket: s3BucketName,
-                    Key: `profile-pictures/${taskId}/${Date.now()}-${file.originalname}`,
-                    Body: fileStream,
-                    ContentType: file.mimetype,
-                };
-
                 try {
-                    const s3UploadResult = await s3.upload(uploadParams).promise();
+                    // Upload the in-memory buffer to Cloudinary (was AWS S3)
+                    const result = await uploadBufferToCloudinary(
+                        file.buffer,
+                        `task-attachments/${taskId}`,
+                        file.originalname
+                    );
 
                     attachments.push({
                         fileName: file.originalname,
-                        fileUrl: s3UploadResult.Location,
-                        s3Key: s3UploadResult.Key,
+                        fileUrl: result.url,
+                        publicId: result.publicId,
                         fileType: file.mimetype,
                         fileSize: file.size,
                     });
-
-                    fs.unlink(file.path, (err) => {
-                        if (err) console.error('Error deleting local file:', err);
-                    });
-
-                } catch (s3Error) {
-                    console.error('Error uploading file to S3:', s3Error);
-                    if (fs.existsSync(file.path)) {
-                        fs.unlink(file.path, (err) => {
-                            if (err) console.error('Error deleting local file after S3 error:', err);
-                        });
-                    }
+                } catch (uploadError) {
+                    console.error('Error uploading attachment to Cloudinary:', uploadError);
                 }
             }
         }
@@ -207,16 +180,9 @@ router.delete("/delete/:commentId", authMiddleware, async (req, res) => {
 
         if (comment.attachments && comment.attachments.length > 0) {
             for (const attachment of comment.attachments) {
-                if (attachment.s3Key) {
-                    try {
-                        await s3.deleteObject({
-                            Bucket: s3BucketName,
-                            Key: attachment.s3Key
-                        }).promise();
-                        console.log(`Deleted S3 object: ${attachment.s3Key}`);
-                    } catch (deleteErr) {
-                         console.error('Error deleting S3 object:', deleteErr);
-                    }
+                // Remove the asset from Cloudinary (was AWS S3 deleteObject)
+                if (attachment.publicId) {
+                    await deleteFromCloudinary(attachment.publicId);
                 }
             }
         }
