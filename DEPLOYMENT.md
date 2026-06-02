@@ -68,6 +68,10 @@ If using **Google OAuth**, add the callback to Google Cloud → Credentials → 
 
 Redeploy the backend so the new env vars take effect.
 
+**SEO URLs:** replace the placeholder `https://projectmanager.vercel.app` with your real Vercel
+domain in `frontend/index.html` (canonical + `og:`/`twitter:` tags) and `frontend/public/robots.txt`,
+so link previews and the sitemap reference the live site.
+
 ---
 
 ## 5. Smoke test
