@@ -1,0 +1,119 @@
+.stats-card-container{
+.time-filter-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .dropdown-btn {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+  }
+  .dropdown{
+    position: relative;
+  }
+  .dropdown-menu{
+    position: absolute;
+    z-index: 2;
+    background-color: white;
+    border: 1px solid rgb(86, 83, 83);
+    left: 0px;
+    border-radius: 8px;
+  }
+  .dropdown-item{
+    margin-bottom: 4px;
+    margin-top: 3px;
+    padding: 10px 16px;
+  }
+  
+  .dropdown-btn svg {
+    margin-left: 5px;
+  }
+  
+  .new-project-btn {
+    display: flex;
+    align-items: center;
+    background-color: #2B3887;
+    color: white;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+  }
+  
+  .new-project-btn svg {
+    margin-left: 5px;
+  }
+  
+  /* Stats Cards */
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .stat-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+  }
+  
+  .stat-card.total::before {
+    background-color: #2e4374;
+  }
+  
+  .stat-card.due-today::before {
+    background-color: #f59e0b;
+  }
+  
+  .stat-card.due::before {
+    background-color: #fbbf24;
+  }
+  
+  .stat-card.overdue::before {
+    background-color: #ef4444;
+  }
+  
+  .stat-card.completed::before {
+    background-color: #10b981;
+  }
+  
+  .stat-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .stat-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+  }
+}
