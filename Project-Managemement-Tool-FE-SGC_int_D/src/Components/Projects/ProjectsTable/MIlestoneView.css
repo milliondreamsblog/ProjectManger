@@ -1,0 +1,301 @@
+.milestone-view {
+  margin: 0 auto;
+  padding: 0px;
+  min-height: 100vh;
+
+  .milestone-view__container {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #e5e7eb;
+    max-width: 1000px;
+  }
+
+  .milestone-view__card {
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+    overflow: hidden;
+  }
+
+  .milestone-view__header {
+    padding: 4px;
+  }
+
+  .milestone-view__header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  ._header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+  }
+
+  .milestone-view__header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .milestone-view__milestone-number {
+    background-color: #dbeafe;
+    color: #1e40af;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .milestone-view__header-right {
+    text-align: right;
+    text-align: center;
+  }
+
+  .milestone-view__amount {
+    font-size: 18px;
+    font-weight: bold;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .milestone-view__status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .milestone-view__status.status-completed {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  .milestone-view__status.status-pending {
+    background-color: #fed7aa;
+    color: #9a3412;
+  }
+
+  .milestone-view__status.status-in-progress {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+
+  .milestone-view__status.status-default {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+
+  .milestone-view__title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+    margin-left: 8px;
+  }
+
+  .milestone-view__details {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    font-size: 14px;
+    color: #4b5563;
+    margin-left: 8px;
+  }
+
+  .milestone-view__detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .milestone-view__icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .milestone-view__tasks {
+    padding: 12px;
+  }
+
+  .milestone-view__tasks-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  .milestone-view__task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .milestone-view__task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: #374151;
+  }
+
+  .milestone-view__task-bullet {
+    width: 6px;
+    height: 6px;
+    background-color: #9ca3af;
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+
+  .milestone-view__task-text {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .milestone-view__no-tasks {
+    color: #6b7280;
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  .milestone-view__no-data {
+    padding: 32px;
+    text-align: center;
+    color: #6b7280;
+  }
+
+  .milestone-view__no-data-icon {
+    margin: 0 auto 16px;
+    width: 48px;
+    height: 48px;
+    opacity: 0.5;
+  }
+
+  /* ===== Milestone Slide Panel ===== */
+
+  .milestone-container {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .milestone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .milestone-badge {
+    background-color: #eef2ff;
+    color: #6366f1;
+    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+
+  .delete-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 20px;
+    transition: color 0.2s ease-in-out;
+  }
+
+  .delete-btn:hover {
+    color: #ef4444;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 12px;
+  }
+
+  .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    font-size: 14px;
+    color: #4b5563;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .form-input {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+  }
+
+  .form-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 1px #6366f1;
+  }
+
+  .due-date {
+    margin-bottom: 10px;
+  }
+
+  .add-milestone-button {
+    margin-top: 10px;
+  }
+
+  .btn-link {
+    background-color: #4f46e5;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-link:hover {
+    background-color: #4338ca;
+  }
+
+  /* ✅ Edit Button Styling */
+  .edit-btn {
+    padding: 4px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 13px;
+  }
+
+  .edit-btn:hover {
+    background-color: #0056b3;
+  }
+
+  /* ✅ Popup Container Styling */
+  .popup-container {
+    width: 500px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
