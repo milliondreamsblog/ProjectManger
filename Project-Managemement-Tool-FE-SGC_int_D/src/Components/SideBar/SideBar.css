@@ -1,0 +1,86 @@
+.sidebar-container {
+  width: 220px;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px 0;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  overflow-y: auto;
+
+  .sidebar-collapse-btn {
+    /* background-color: yellow; */
+    display: flex;
+    justify-content: end;
+    padding: 5px 12px;
+    color: #666;
+    cursor: pointer;
+  }
+
+  .logo {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .logo img {
+    height: 40px;
+    width: auto;
+  }
+
+  .nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #666;
+    transition: all 0.2s ease;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+
+  .nav-item span {
+    margin-left: 12px;
+    font-size: 14px;
+  }
+
+  .nav-item:hover {
+    background-color: #f5f7fa;
+    color: #2e4374;
+  }
+
+  .nav-item.active {
+    background-color: #f0f4ff;
+    color: #2e4374;
+    font-weight: 500;
+    border-left: 3px solid #2e4374;
+  }
+}
+/* Navigation item */
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  color: #666;
+  text-decoration: none;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+/* Hide text in collapsed state */
+.collapse-nav-menu .nav-item span {
+  display: none;
+}
+
+/* Optional: collapse button styling */
+.sidebar-collapse-btn {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  cursor: pointer;
+}
