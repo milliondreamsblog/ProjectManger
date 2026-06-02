@@ -13,31 +13,36 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const Task = require("../models/Task1");
 require("dotenv").config();
-const AWS = require("aws-sdk");
+// const AWS = require("aws-sdk"); // replaced by Cloudinary
+const {
+  uploadBufferToCloudinary,
+  deleteFromCloudinary,
+} = require("../utils/cloudinaryUpload");
 
 const router = express.Router();
 
 router.use(passport.initialize());
 
-// Configure AWS S3
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
-});
-const s3BucketName = process.env.AWS_S3_BUCKET_NAME;
+// ----- (legacy) AWS S3 config — replaced by Cloudinary -----
+// const s3 = new AWS.S3({
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   region: process.env.AWS_REGION,
+// });
+// const s3BucketName = process.env.AWS_S3_BUCKET_NAME;
+//
+// // Configure multer for disk storage (temp local before S3)
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "uploads/");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, Date.now() + "-" + file.originalname);
+//   },
+// });
 
-// Configure multer for file upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-const upload = multer({ storage: storage });
+// Multer in-memory storage — buffers are streamed straight to Cloudinary.
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Register Admin (Only existing admins can create new admins)
 // , authMiddleware, roleMiddleware(["admin"])
@@ -771,48 +776,36 @@ router.put(
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Handle profile picture upload
+      // Handle profile picture upload (Cloudinary)
       if (req.file) {
         const file = req.file;
-        const fileStream = fs.createReadStream(file.path);
 
-        const uploadParams = {
-          Bucket: s3BucketName,
-          Key: `profile-pictures/${file.filename}`, // Unique key for S3
-          Body: fileStream,
-          ContentType: file.mimetype,
-        };
+        // ----- (legacy) AWS S3 upload — replaced by Cloudinary -----
+        // const fileStream = fs.createReadStream(file.path);
+        // const uploadParams = {
+        //   Bucket: s3BucketName,
+        //   Key: `profile-pictures/${file.filename}`,
+        //   Body: fileStream,
+        //   ContentType: file.mimetype,
+        // };
+        // const s3UploadResult = await s3.upload(uploadParams).promise();
+        // fs.unlink(file.path, (err) => { if (err) console.error(err); });
 
-        // Upload to S3
-        const s3UploadResult = await s3.upload(uploadParams).promise();
-
-        // Delete the local file after S3 upload
-        fs.unlink(file.path, (err) => {
-          if (err) console.error("Error deleting local file:", err);
-        });
-
-        // If user already has a profile picture in S3, delete it
-        // Assuming your User model stores s3Key now
-        if (user.profilePicture && user.profilePicture.s3Key) {
-          try {
-            await s3
-              .deleteObject({
-                Bucket: s3BucketName,
-                Key: user.profilePicture.s3Key,
-              })
-              .promise();
-            console.log(`Deleted old S3 object: ${user.profilePicture.s3Key}`);
-          } catch (deleteErr) {
-            console.error("Error deleting old S3 object:", deleteErr);
-            // Continue even if old file deletion fails
-          }
+        // Remove the previous picture from Cloudinary if present
+        if (user.profilePicture && user.profilePicture.publicId) {
+          await deleteFromCloudinary(user.profilePicture.publicId);
         }
 
-        // Update profile picture information in user document
-        // Assuming your User model has a profilePicture object with url and s3Key
+        // Upload the new picture buffer to Cloudinary
+        const result = await uploadBufferToCloudinary(
+          file.buffer,
+          "profile-pictures",
+          file.originalname
+        );
+
         user.profilePicture = {
-          url: s3UploadResult.Location, // S3 URL
-          s3Key: s3UploadResult.Key, // S3 Key
+          url: result.url, // Cloudinary secure URL
+          publicId: result.publicId, // Cloudinary public_id
         };
       }
 
