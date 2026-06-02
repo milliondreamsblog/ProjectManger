@@ -1,0 +1,4 @@
+first change the credentails of google client_id and client_secret, change frontend url in .env file, 
+change mongodb credentails
+change cloudnary credentails
+change emails and password for sending mails
