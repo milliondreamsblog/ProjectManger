@@ -1,0 +1,29 @@
+.templates-subtask-item{
+    border-bottom: 1px solid var(--color-neutral-200);
+    margin-left: var(--spacing-5);
+  
+  
+  .templates-subtask-item:last-child {
+    border-bottom: none;
+  }
+  
+  .subtask-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+  
+  .subtask-title {
+    font-size: 14px;
+    color: var(--color-neutral-700);
+  }
+  
+  .subtask-duration {
+    font-size: 14px;
+    color: var(--color-neutral-600);
+    background-color: var(--color-neutral-200);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--border-radius-sm);
+  }
+}
