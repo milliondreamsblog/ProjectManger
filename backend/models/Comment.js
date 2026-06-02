@@ -9,7 +9,8 @@ const commentSchema = new mongoose.Schema({
         fileUrl: { type: String, required: true },
         fileType: { type: String, required: true },
         fileSize: { type: Number },
-        s3Key: { type: String }
+        publicId: { type: String }, // Cloudinary public_id (was s3Key)
+        s3Key: { type: String } // legacy, kept for backward compatibility
     }],
     driveLinks: [{
         isDrive: { type: Boolean, default: false },
