@@ -1,0 +1,29 @@
+.projectTemplate-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-5);
+  
+  
+  .project-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-neutral-900);
+  }
+  
+  .new-template-button {
+    display: flex;
+    align-items: center;
+    background-color: #2B3887;
+    color: white;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .new-template-button svg {
+    margin-left: var(--spacing-1);
+  }
+}
