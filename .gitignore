@@ -16,8 +16,8 @@
 **/build/
 
 # Original company's user-uploaded files (do not publish their data)
-Project-Management-Tool-BE-DevSgcBEBP/uploads/*
-!Project-Management-Tool-BE-DevSgcBEBP/uploads/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
 
 # Logs / OS / editor
 *.log

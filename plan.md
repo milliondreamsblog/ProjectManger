@@ -27,8 +27,8 @@ is shared with the original company.
 
 | Part | Stack | Folder |
 |---|---|---|
-| Frontend | React 19 + Vite, custom CSS | `Project-Managemement-Tool-FE-SGC_int_D/` |
-| Backend | Node/Express + Mongoose | `Project-Management-Tool-BE-DevSgcBEBP/` |
+| Frontend | React 19 + Vite, custom CSS | `frontend/` |
+| Backend | Node/Express + Mongoose | `backend/` |
 | Database | MongoDB | (Atlas, to be created) |
 | File storage | **Cloudinary** (swapping off AWS S3) | (to be created) |
 | Real-time | Pusher Channels | (to be created) |
