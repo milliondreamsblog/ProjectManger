@@ -92,74 +92,56 @@ router.get("/callback", async (req, res) => {
   }
 });
 
-// ✅ Route to fetch clients from Zoho Books
+// ✅ Route to fetch clients.
+// NOTE: In the portfolio build, Zoho Books is mocked — instead of calling the
+// paid Zoho API, we serve clients straight from the seeded `Client` collection,
+// returning the same shape the frontend expects ({ clients: [{id,name,...}] }).
+const Client = require("../models/ClientName");
+
 router.get("/clients", async (req, res) => {
   try {
-    // Get token from DB
-    let tokenDoc = await ZohoToken.findOne();
-    console.log("🔑 Found token in DB:", tokenDoc);
-    if (!tokenDoc) {
-      return res.status(400).send("No token found. Please authorize Zoho first.");
-    }
-
-    // Keep REFRESH_TOKEN in memory for faster refresh calls
-    REFRESH_TOKEN = tokenDoc.refresh_token;
-
-    // Check if expired
-    if (new Date() >= tokenDoc.expires_at) {
-      console.log("⚠️ Access token expired, refreshing...");
-      await getAccessToken(); // refresh token flow
-      tokenDoc = await ZohoToken.findOne(); // re-fetch updated record
-    }
-
-    console.log("🔑 Using token:", tokenDoc.access_token);
-
-    // ✅ Fetch clients from Zoho Books
-    let resp;
-    try {
-      resp = await axios.get(
-        `https://www.zohoapis.com/books/v3/contacts?organization_id=${ORG_ID}`, // 👈 use .in if your Books URL is .in
-        {
-          headers: {
-            Authorization: `Zoho-oauthtoken ${tokenDoc.access_token}`,
-          },
-        }
-      );
-    } catch (err) {
-      // If token is invalid, try refreshing
-      if (err.response?.data?.code === 57 || err.response?.data?.message?.includes("INVALID_OAUTHTOKEN")) {
-        console.log("⚠️ Zoho token invalid, refreshing...");
-        await getAccessToken(); // refresh token flow
-        tokenDoc = await ZohoToken.findOne();
-        resp = await axios.get(
-          `https://www.zohoapis.com/books/v3/contacts?organization_id=${ORG_ID}`,
-          {
-            headers: {
-
-              Authorization: `Zoho-oauthtoken ${tokenDoc.access_token}`,
-            },
-          }
-        );
-      } else {
-        throw err;
-      }
-    }
-
-    const clients = resp.data.contacts.map((c) => ({
-      id: c.contact_id,
-      name: c.contact_name,
-      company_name: c.company_name || null,
+    const docs = await Client.find({}).sort({ name: 1 });
+    const clients = docs.map((c) => ({
+      id: c.zohoId,
+      name: c.name,
+      company_name: c.companyName || null,
       email: c.email || null,
     }));
-
-    console.log("✅ Clients fetched:", clients.length);
     res.json({ clients });
   } catch (err) {
-    console.error("❌ Zoho API error:", err.response?.data || err.message);
-    res.status(500).json({
-      error: err.response?.data || err.message || "Zoho API error",
-    });
+    console.error("❌ Error fetching clients:", err.message);
+    res.status(500).json({ error: err.message || "Error fetching clients" });
   }
 });
+
+/* ----------------------------------------------------------------------------
+ * (legacy) Live Zoho Books fetch — replaced by the mocked DB-backed route above.
+ * Kept for reference in case real Zoho integration is restored later.
+ *
+ * router.get("/clients", async (req, res) => {
+ *   try {
+ *     let tokenDoc = await ZohoToken.findOne();
+ *     if (!tokenDoc) return res.status(400).send("No token found. Please authorize Zoho first.");
+ *     REFRESH_TOKEN = tokenDoc.refresh_token;
+ *     if (new Date() >= tokenDoc.expires_at) {
+ *       await getAccessToken();
+ *       tokenDoc = await ZohoToken.findOne();
+ *     }
+ *     const resp = await axios.get(
+ *       `https://www.zohoapis.com/books/v3/contacts?organization_id=${ORG_ID}`,
+ *       { headers: { Authorization: `Zoho-oauthtoken ${tokenDoc.access_token}` } }
+ *     );
+ *     const clients = resp.data.contacts.map((c) => ({
+ *       id: c.contact_id,
+ *       name: c.contact_name,
+ *       company_name: c.company_name || null,
+ *       email: c.email || null,
+ *     }));
+ *     res.json({ clients });
+ *   } catch (err) {
+ *     res.status(500).json({ error: err.response?.data || err.message });
+ *   }
+ * });
+ * ------------------------------------------------------------------------- */
 
 module.exports = router;
