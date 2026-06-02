@@ -1,0 +1,27 @@
+# ===== Root safety-net .gitignore for the whole monorepo =====
+# (Each sub-app also has its own .gitignore.)
+
+# Dependencies
+**/node_modules/
+
+# Environment / secrets — NEVER commit real values (.env.example is fine)
+.env
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Build output
+**/dist/
+**/dist-ssr/
+**/build/
+
+# Original company's user-uploaded files (do not publish their data)
+Project-Management-Tool-BE-DevSgcBEBP/uploads/*
+!Project-Management-Tool-BE-DevSgcBEBP/uploads/.gitkeep
+
+# Logs / OS / editor
+*.log
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea
