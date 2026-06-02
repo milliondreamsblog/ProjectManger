@@ -1,0 +1,1 @@
+export const locations= ['Japan', 'Gurgaon', 'Bangalore', 'Mumbai', 'Ahmedabad']
