@@ -1,0 +1,117 @@
+.calender-container {
+  height: 90vh;
+  overflow-y: scroll;
+  padding: 20px 30px;
+  flex: 1;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Calendar Header (Google Buttons) */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.google-btn {
+  background-color: #2b3887;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.google-btn:hover {
+  background-color: #1765cc;
+}
+
+/* Toolbar Label - Month + Year */
+.rbc-toolbar-label {
+  font-size: 24px;
+  font-weight: 700;
+  color: #202124;
+}
+
+/* Navigation Buttons */
+.rbc-btn-group button {
+  background-color: #f1f3f4;
+  color: #202124;
+  border: 1px solid #dadce0;
+  padding: 6px 12px;
+  font-weight: 500;
+  margin: 0 2px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.rbc-btn-group button:hover {
+  background-color: #e8eaed;
+  cursor: pointer;
+}
+
+/* Weekday Header (Mon, Tue...) */
+.rbc-header {
+  font-weight: 600;
+  background-color: #f8f9fa;
+  color: #202124;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Event styling */
+.custom-event {
+  transition: background-color 0.3s ease;
+  position: relative;
+}
+
+.custom-event:hover {
+  background-color: #0d47a1 !important;
+  cursor: pointer;
+}
+
+/* Event wrapper and Join button */
+.event-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.join-meeting-btn {
+  display: none;
+  margin-left: 8px;
+  padding: 2px 6px;
+  font-size: 12px;
+  background: white;
+  color: #1a73e8;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.custom-event:hover .join-meeting-btn {
+  display: inline-block;
+}
+
+/* Optional: soften calendar grid borders */
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid #eee;
+}
+
+.rbc-time-content {
+  border-top: 1px solid #eee;
+}
+
+/* Fix row segment overflow */
+.rbc-row-segment {
+  max-width: 14.149%;
+}
