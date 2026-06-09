@@ -116,12 +116,25 @@ const PORT = process.env.PORT || 5001;
    
  
 connectDB()
-  .then(() => {
+  .then(async () => {
     console.log("Database Connection established...");
-    server.listen(PORT, (req, res) => {
-      console.log(`Server runningg on port ${PORT}`);
+
+    // When running on the zero-config in-memory DB, auto-seed demo data so the
+    // app is immediately usable (login with admin@demo.com / Demo@12345).
+    if (process.env.USING_MEMORY_DB === "true") {
+      try {
+        const { seedDatabase } = require("./scripts/seed");
+        await seedDatabase();
+        console.log("🌱 In-memory DB seeded with demo data.");
+      } catch (seedErr) {
+        console.error("⚠️ Failed to seed in-memory DB:", seedErr.message);
+      }
+    }
+
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.log("Database is not connected");
+    console.log("Database is not connected", err);
   });

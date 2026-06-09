@@ -1,5 +1,5 @@
 {
-  "name": "suzuki-consulting-project-managemement-tool",
+  "name": "@pm/web",
   "private": true,
   "version": "0.0.0",
   "type": "module",

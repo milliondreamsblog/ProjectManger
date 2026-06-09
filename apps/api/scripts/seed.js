@@ -1,13 +1,14 @@
 /**
- * Database seed script — creates a ready-to-explore demo dataset.
+ * Database seed — creates a ready-to-explore demo dataset.
  *
- *   Run:  npm run seed   (from the backend/ folder)
+ *   CLI:   npm run seed          (connects using MONGO_URI, seeds, exits)
+ *   Code:  require('./scripts/seed').seedDatabase()   (assumes an open mongoose connection)
  *
  * Creates role configs, demo users (admin/manager/opic), clients, and a couple
  * of fully-wired projects (milestones → tasks → subtasks → comments).
  *
  * ⚠️ This WIPES the seeded collections first, so only run it against a
- *    dev/demo database (your own MongoDB Atlas), never production data.
+ *    dev/demo database, never production data.
  */
 require("dotenv").config();
 const mongoose = require("mongoose");
@@ -47,15 +48,10 @@ const pad = (n) => String(n).padStart(2, "0");
 const today = new Date();
 const STAMP = `${String(today.getFullYear()).slice(2)}${pad(today.getMonth() + 1)}${pad(today.getDate())}`;
 
-async function seed() {
-  if (!process.env.MONGO_URI) {
-    console.error("❌ MONGO_URI is not set. Add it to backend/.env first.");
-    process.exit(1);
-  }
-
-  await mongoose.connect(process.env.MONGO_URI);
-  console.log("🔌 Connected to MongoDB");
-
+/**
+ * Seed the database. Assumes mongoose is already connected.
+ */
+async function seedDatabase() {
   // 1. Wipe seeded collections
   await Promise.all([
     User.deleteMany({}),
@@ -145,7 +141,6 @@ async function seed() {
     const taskIds = [];
     for (const spec of taskSpecs) {
       taskSeq += 1;
-      // subtasks
       const subtaskDocs = await Subtask.insertMany(
         spec.subtasks.map((s) => ({
           name: s.name,
@@ -170,7 +165,6 @@ async function seed() {
         milestone: milestone._id,
       });
 
-      // a demo comment per task
       const comment = await Comment.create({
         content: spec.comment,
         user: opic1._id,
@@ -257,13 +251,27 @@ async function seed() {
   console.log("   Admin    →  admin@demo.com    / " + DEMO_PASSWORD);
   console.log("   Manager  →  manager@demo.com  / " + DEMO_PASSWORD);
   console.log("   OPIC     →  opic1@demo.com    / " + DEMO_PASSWORD);
+}
 
+// CLI entry point — connect, seed, disconnect.
+async function runCli() {
+  if (!process.env.MONGO_URI) {
+    console.error("❌ MONGO_URI is not set. Add it to backend/.env first.");
+    process.exit(1);
+  }
+  await mongoose.connect(process.env.MONGO_URI);
+  console.log("🔌 Connected to MongoDB");
+  await seedDatabase();
   await mongoose.disconnect();
   process.exit(0);
 }
 
-seed().catch(async (err) => {
-  console.error("❌ Seed failed:", err);
-  await mongoose.disconnect().catch(() => {});
-  process.exit(1);
-});
+if (require.main === module) {
+  runCli().catch(async (err) => {
+    console.error("❌ Seed failed:", err);
+    await mongoose.disconnect().catch(() => {});
+    process.exit(1);
+  });
+}
+
+module.exports = { seedDatabase, DEMO_PASSWORD };
