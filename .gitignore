@@ -16,8 +16,8 @@
 **/build/
 
 # Original company's user-uploaded files (do not publish their data)
-backend/uploads/*
-!backend/uploads/.gitkeep
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep
 
 # Logs / OS / editor
 *.log
@@ -25,3 +25,12 @@ backend/uploads/*
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# Turborepo / Expo
+.turbo/
+**/.turbo/
+.expo/
+**/.expo/
+
+# Claude Code local
+.claude/

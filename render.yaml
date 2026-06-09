@@ -9,11 +9,11 @@ services:
   - type: web
     name: projectmanager-api
     runtime: node
-    rootDir: backend
     plan: free
     branch: main
-    buildCommand: npm install
-    startCommand: npm start
+    # Monorepo (pnpm): build from repo root, install only the API workspace + its deps.
+    buildCommand: corepack enable && pnpm install --filter @pm/api...
+    startCommand: pnpm --filter @pm/api start
     healthCheckPath: /health
     autoDeploy: true
     envVars:
