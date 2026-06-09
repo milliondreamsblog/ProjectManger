@@ -194,6 +194,26 @@ importers:
         specifier: ^6.2.0
         version: 6.4.3(@types/node@25.9.2)
 
+  packages/api-client:
+    dependencies:
+      '@pm/config':
+        specifier: workspace:*
+        version: link:../config
+      '@pm/types':
+        specifier: workspace:*
+        version: link:../types
+      axios:
+        specifier: ^1.11.0
+        version: 1.17.0
+
+  packages/config: {}
+
+  packages/types:
+    dependencies:
+      '@pm/config':
+        specifier: workspace:*
+        version: link:../config
+
 packages:
 
   '@aws-crypto/crc32@5.2.0':
