@@ -2,6 +2,7 @@ import { Text } from "react-native";
 import { Redirect, Tabs } from "expo-router";
 import { useAuth } from "../../auth/AuthContext";
 import { useRealtime } from "../../lib/realtime";
+import { usePushRegistration } from "../../lib/push";
 import { Loading } from "../../components/ui";
 import { theme } from "../../theme";
 
@@ -10,6 +11,7 @@ const icon = (emoji: string) => () => <Text style={{ fontSize: 20 }}>{emoji}</Te
 export default function TabsLayout() {
   const { user, loading } = useAuth();
   useRealtime();
+  usePushRegistration();
   if (loading) return <Loading />;
   if (!user) return <Redirect href="/login" />;
 
