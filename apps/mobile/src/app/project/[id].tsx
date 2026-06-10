@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import type { SubTask, Task } from "@pm/types";
 import { api } from "../../lib/api";
-import { Screen, H1, H2, Body, Card, Badge, Progress, Loading, ErrorText } from "../../components/ui";
+import { useAuth } from "../../auth/AuthContext";
+import { Screen, H1, H2, Body, Card, Badge, Button, Progress, Loading, ErrorText } from "../../components/ui";
 import { theme } from "../../theme";
 
 export default function ProjectDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { hasPermission } = useAuth();
 
   const projectsQ = useQuery({ queryKey: ["projects"], queryFn: () => api.projects.list() });
   const tasksQ = useQuery({ queryKey: ["project-tasks", id], queryFn: () => api.tasks.byProject(id) });
@@ -47,13 +49,21 @@ export default function ProjectDetail() {
       )}
 
       <H2>Tasks</H2>
+      {hasPermission("create_task") && (
+        <Button
+          title="＋ New task"
+          onPress={() => router.push({ pathname: "/new-task", params: { projectId: id } })}
+        />
+      )}
       {tasksQ.isError ? <ErrorText>Couldn't load tasks.</ErrorText> : null}
       {tasks.map((t: Task) => {
         const subs = (t.subtasks ?? []) as SubTask[];
         return (
           <Pressable
             key={t._id}
-            onPress={() => router.push({ pathname: "/task/[id]", params: { id: t._id, name: t.taskName } })}
+            onPress={() =>
+              router.push({ pathname: "/task/[id]", params: { id: t._id, name: t.taskName, projectId: id } })
+            }
           >
             <Card>
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>

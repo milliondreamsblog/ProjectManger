@@ -19,6 +19,8 @@ export default function RootLayout() {
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="project/[id]" options={{ headerShown: true, title: "Project" }} />
               <Stack.Screen name="task/[id]" options={{ headerShown: true, title: "Task" }} />
+              <Stack.Screen name="new-project" options={{ headerShown: true, title: "New Project", presentation: "modal" }} />
+              <Stack.Screen name="new-task" options={{ headerShown: true, title: "New Task", presentation: "modal" }} />
               <Stack.Screen name="settings" options={{ headerShown: true, title: "Settings" }} />
               <Stack.Screen name="notifications" options={{ headerShown: true, title: "Notifications" }} />
               <Stack.Screen name="audit" options={{ headerShown: true, title: "Audit Logs" }} />

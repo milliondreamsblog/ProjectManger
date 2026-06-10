@@ -2,11 +2,13 @@ import { Pressable, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { api } from "../../lib/api";
-import { Screen, H1, Body, Card, Badge, Loading, ErrorText } from "../../components/ui";
+import { useAuth } from "../../auth/AuthContext";
+import { Screen, H1, Body, Card, Badge, Button, Loading, ErrorText } from "../../components/ui";
 import { theme } from "../../theme";
 
 export default function Projects() {
   const router = useRouter();
+  const { hasPermission } = useAuth();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["projects"],
     queryFn: () => api.projects.list(),
@@ -18,6 +20,9 @@ export default function Projects() {
   return (
     <Screen>
       <H1>Projects</H1>
+      {hasPermission("create_project") && (
+        <Button title="＋ New project" onPress={() => router.push("/new-project")} />
+      )}
       {isError ? <ErrorText>Couldn't load projects.</ErrorText> : null}
       {projects.map((p) => (
         <Pressable key={p._id} onPress={() => router.push(`/project/${p._id}`)}>
