@@ -33,6 +33,14 @@ export default function ProjectDetail() {
         </Body>
       ) : null}
 
+      <Button
+        title="🕸️ View dependency graph"
+        variant="secondary"
+        onPress={() =>
+          router.push({ pathname: "/project-graph", params: { projectId: id, name: project?.projectName ?? "" } })
+        }
+      />
+
       {milestones.length > 0 && (
         <>
           <H2>Milestones</H2>
