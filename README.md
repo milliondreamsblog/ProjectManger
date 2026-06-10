@@ -246,68 +246,62 @@ sequenceDiagram
 
 ## 📂 Repository Structure
 
+**Turborepo monorepo** (pnpm workspaces):
+
 ```
 ProjectManager/
-├── backend/                     # Express + Mongoose REST API
-│   ├── config/                  # db.js, cloudinary.js
-│   ├── models/                  # 13 Mongoose schemas
-│   ├── middlewares/             # auth, permission, role, audit
-│   ├── routes/                  # 13 route groups (/api/*)
-│   ├── services/                # email, notifications
-│   ├── cron/                    # deadline notification job
-│   ├── PusherNotification/      # real-time push
-│   ├── server.js                # entry point
-│   └── .env.example
-├── frontend/                    # React 19 + Vite SPA
-│   ├── src/
-│   │   ├── api/axios.js         # central API config (VITE_API_BASE_URL)
-│   │   ├── Pages/               # 16 routed pages
-│   │   ├── Components/          # 40+ feature components
-│   │   ├── context/             # Auth & Calendar context
-│   │   └── utils/
-│   └── .env.example
-├── plan.md                      # hosting / productionization plan
+├── apps/
+│   ├── api/            # Express + Mongoose REST API (models, routes, middleware, cron, seed)
+│   ├── web/            # React 19 + Vite SPA (Pages, Components, context, api/axios.js)
+│   └── mobile/         # React Native (Expo + expo-router, TS) — full web parity
+├── packages/
+│   ├── config/         # shared constants/enums (roles, permissions, statuses, palette)
+│   ├── types/          # shared domain types (User, Project, Task, …)
+│   └── api-client/     # shared typed REST client (auth interceptor + endpoints)
+├── turbo.json · pnpm-workspace.yaml
+├── plan.md · MONOREPO_MOBILE_PLAN.md · DEPLOYMENT.md
 └── README.md
 ```
+
+The web and mobile apps share the same backend and the `@pm/*` packages (the API client,
+types, and config) — UI is platform-specific, the data layer is shared.
 
 ---
 
 ## 🛠️ Local Setup
 
 ### Prerequisites
-- **Node.js ≥ 18** (Docker images use Node 20) and npm
-- A **MongoDB** connection string (free [MongoDB Atlas](https://cloud.mongodb.com) M0, or local MongoDB)
-- *(Optional, for full features)* Cloudinary, Pusher, and Google Cloud credentials
+- **Node.js ≥ 18** (Docker images use Node 20)
+- **pnpm** (`corepack enable`) — the monorepo uses pnpm workspaces
+- A **MongoDB** connection string ([MongoDB Atlas](https://cloud.mongodb.com) M0 free) — *optional
+  for local dev:* if `MONGO_URI` is unset the API spins up an **in-memory MongoDB** and auto-seeds.
 
-### 1. Clone
+### 1. Clone & install
 ```bash
 git clone https://github.com/milliondreamsblog/ProjectManger.git
 cd ProjectManger
+pnpm install
 ```
 
-### 2. Backend
+### 2. Run the API + web
 ```bash
-cd backend
-npm install
-cp .env.example .env        # Windows PowerShell: copy .env.example .env
-# Edit .env — at minimum set MONGO_URI and JWT_SECRET
-npm run dev                 # starts on http://localhost:5001 (nodemon)
+# (optional) configure: cp apps/api/.env.example apps/api/.env  — set MONGO_URI, JWT_SECRET
+pnpm --filter @pm/api dev      # http://localhost:5001  (in-memory DB + auto-seed if no MONGO_URI)
+pnpm --filter @pm/web dev      # http://localhost:5174
+# …or run everything at once:  pnpm dev   (Turborepo)
 ```
+Open **http://localhost:5174** and log in with the seeded demo admin:
+**`admin@demo.com` / `Demo@12345`**.
 
-### 3. Frontend (in a second terminal)
+### 3. Run the mobile app (Expo)
 ```bash
-cd frontend
-npm install
-cp .env.example .env        # Windows PowerShell: copy .env.example .env
-# Set VITE_API_BASE_URL=http://localhost:5001
-npm run dev                 # starts on http://localhost:5174
+cp apps/mobile/.env.example apps/mobile/.env   # set EXPO_PUBLIC_API_URL (LAN IP for a real phone)
+pnpm --filter @pm/mobile start                 # scan the QR with Expo Go
 ```
 
-Open **http://localhost:5174** 🎉
-
-> **Minimum to boot:** `MONGO_URI` + `JWT_SECRET`. Cloudinary/Pusher/Google enable file
-> uploads, real-time notifications, and Google login/calendar respectively. A demo **seed
-> script** (`npm run seed`) with a one-click demo admin login is on the roadmap below.
+> **Zero-config:** `pnpm --filter @pm/api dev` runs the whole backend with **no setup** thanks to
+> the in-memory MongoDB fallback (data resets each restart). Provide `MONGO_URI` for a persistent
+> DB. Cloudinary / Pusher / Google credentials are optional — those features degrade gracefully.
 
 ---
 
