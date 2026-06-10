@@ -1,5 +1,6 @@
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const { sendExpoPush } = require('./pushService');
 
 /**
  * Send a notification to a single user
@@ -21,6 +22,17 @@ const sendNotification = async (recipientId, title, message, type, referenceId) 
         });
         
         await notification.save();
+
+        // Fire-and-forget Expo push to the recipient's registered devices.
+        try {
+            const recipient = await User.findById(recipientId).select('expoPushTokens');
+            if (recipient?.expoPushTokens?.length) {
+                await sendExpoPush(recipient.expoPushTokens, title, message, { type, referenceId });
+            }
+        } catch (pushErr) {
+            console.error('Push dispatch error:', pushErr.message);
+        }
+
         return notification;
     } catch (error) {
         console.error('Error sending notification:', error);

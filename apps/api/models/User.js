@@ -15,6 +15,7 @@ const UserSchema = new mongoose.Schema({
         publicId: { type: String }
     },
     permissions: [{ type: String, default: [] }],
+    expoPushTokens: [{ type: String }], // registered mobile device push tokens
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date }
 }, { timestamps: true });

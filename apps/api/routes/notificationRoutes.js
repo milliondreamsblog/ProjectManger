@@ -1,14 +1,28 @@
 // routes/notificationRoutes.js
 const express = require("express");
 const Notification = require("../models/Notification");
+const User = require("../models/User");
 const authMiddleware = require("../middlewares/authMiddleware");
-const { 
-    getUserNotifications, 
-    markNotificationAsRead, 
-    markAllNotificationsAsRead 
+const {
+    getUserNotifications,
+    markNotificationAsRead,
+    markAllNotificationsAsRead
 } = require('../services/notificationService');
 
 const router = express.Router();
+
+// Register a mobile device's Expo push token for the authenticated user.
+router.post('/register-token', authMiddleware, async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) return res.status(400).json({ success: false, message: 'token is required' });
+        await User.findByIdAndUpdate(req.user.id, { $addToSet: { expoPushTokens: token } });
+        res.status(200).json({ success: true, message: 'Push token registered' });
+    } catch (error) {
+        console.error('Error registering push token:', error);
+        res.status(500).json({ success: false, message: 'Error registering push token', error: error.message });
+    }
+});
 
 // Get all notifications for the authenticated user
 router.get('/', authMiddleware, async (req, res) => {
