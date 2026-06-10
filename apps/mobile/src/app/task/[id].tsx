@@ -2,20 +2,33 @@ import { useState } from "react";
 import { View } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams } from "expo-router";
-import type { Comment, User } from "@pm/types";
+import { TASK_STATUS } from "@pm/config";
+import type { Comment, SubTask, Task, User } from "@pm/types";
 import { api } from "../../lib/api";
-import { Screen, H1, H2, Body, Card, Field, Button, Loading, ErrorText } from "../../components/ui";
+import { Screen, H1, H2, Body, Card, Field, Button, Badge, Progress, Loading, ErrorText } from "../../components/ui";
+import { Select } from "../../components/Select";
 import { theme } from "../../theme";
 
+const STATUS_OPTIONS = Object.values(TASK_STATUS).map((s) => ({ label: s, value: s }));
+
 export default function TaskDetail() {
-  const { id, name } = useLocalSearchParams<{ id: string; name?: string }>();
+  const { id, name, projectId } = useLocalSearchParams<{ id: string; name?: string; projectId?: string }>();
   const qc = useQueryClient();
   const [text, setText] = useState("");
+  const [subtaskName, setSubtaskName] = useState("");
 
-  const commentsQ = useQuery({
-    queryKey: ["comments", id],
-    queryFn: () => api.comments.byTask(id),
+  const commentsQ = useQuery({ queryKey: ["comments", id], queryFn: () => api.comments.byTask(id) });
+
+  // Task object (incl. subtasks) is available when we arrived from a project.
+  const tasksQ = useQuery({
+    queryKey: ["project-tasks", projectId],
+    queryFn: () => api.tasks.byProject(projectId as string),
+    enabled: !!projectId,
   });
+  const task = (tasksQ.data ?? []).find((t: Task) => t._id === id);
+  const subtasks = (task?.subtasks ?? []) as SubTask[];
+
+  const invalidateTask = () => qc.invalidateQueries({ queryKey: ["project-tasks", projectId] });
 
   const addComment = useMutation({
     mutationFn: async (content: string) => {
@@ -29,13 +42,78 @@ export default function TaskDetail() {
     },
   });
 
+  const setStatus = useMutation({
+    mutationFn: (teamStatus: string) => api.tasks.update(id, { teamStatus }),
+    onSuccess: invalidateTask,
+  });
+
+  const addSubtask = useMutation({
+    mutationFn: (n: string) => api.tasks.addSubtask(id, { name: n }),
+    onSuccess: () => {
+      setSubtaskName("");
+      invalidateTask();
+    },
+  });
+
+  const toggleSubtask = useMutation({
+    mutationFn: (s: SubTask) =>
+      api.tasks.updateSubtask(s._id, {
+        status: s.status === "Completed" ? "In Progress" : "Completed",
+      }),
+    onSuccess: invalidateTask,
+  });
+
   if (commentsQ.isLoading) return <Loading />;
   const comments = commentsQ.data?.comments ?? [];
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: name ?? "Task" }} />
-      <H1>{name ?? "Task"}</H1>
+      <Stack.Screen options={{ title: name ?? task?.taskName ?? "Task" }} />
+      <H1>{name ?? task?.taskName ?? "Task"}</H1>
+      {task ? (
+        <>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.sm }}>
+            <Badge label={task.teamStatus} />
+            <Body muted>{task.taskId}</Body>
+          </View>
+          <Progress value={task.progress ?? 0} />
+
+          <Card>
+            <H2>Status</H2>
+            <Select
+              label="Set task status"
+              value={task.teamStatus}
+              options={STATUS_OPTIONS}
+              onChange={(s) => setStatus.mutate(s)}
+            />
+          </Card>
+
+          <Card>
+            <H2>Subtasks</H2>
+            {subtasks.map((s) => (
+              <View
+                key={s._id}
+                style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: theme.spacing.sm }}
+              >
+                <Body>{s.name}</Body>
+                <Button
+                  title={s.status === "Completed" ? "Reopen" : "Complete"}
+                  variant="secondary"
+                  onPress={() => toggleSubtask.mutate(s)}
+                />
+              </View>
+            ))}
+            {subtasks.length === 0 ? <Body muted>No subtasks.</Body> : null}
+            <Field label="New subtask" value={subtaskName} onChangeText={setSubtaskName} placeholder="Subtask name" />
+            <Button
+              title="Add subtask"
+              onPress={() => subtaskName.trim() && addSubtask.mutate(subtaskName.trim())}
+              loading={addSubtask.isPending}
+              disabled={!subtaskName.trim()}
+            />
+          </Card>
+        </>
+      ) : null}
 
       <Card>
         <H2>Add a comment</H2>
