@@ -122,6 +122,7 @@ export function createApiClient(opts: ApiClientOptions) {
         get<Notification[]>("/api/notifications", unreadOnly ? { unreadOnly: true } : undefined),
       markRead: (id: string) => put(`/api/notifications/${id}/read`),
       markAllRead: () => put("/api/notifications/read-all"),
+      registerToken: (token: string) => post("/api/notifications/register-token", { token }),
     },
 
     calendar: {
