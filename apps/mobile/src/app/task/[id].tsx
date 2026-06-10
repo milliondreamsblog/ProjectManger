@@ -2,6 +2,8 @@ import { useState } from "react";
 import { View } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { TASK_STATUS } from "@pm/config";
 import type { Comment, SubTask, Task, User } from "@pm/types";
 import { api } from "../../lib/api";
@@ -16,6 +18,22 @@ export default function TaskDetail() {
   const qc = useQueryClient();
   const [text, setText] = useState("");
   const [subtaskName, setSubtaskName] = useState("");
+  const [files, setFiles] = useState<{ uri: string; name: string; type: string }[]>([]);
+
+  const pickImage = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.8 });
+    if (!res.canceled && res.assets?.[0]) {
+      const a = res.assets[0];
+      setFiles((f) => [...f, { uri: a.uri, name: a.fileName ?? `photo-${f.length}.jpg`, type: a.mimeType ?? "image/jpeg" }]);
+    }
+  };
+  const pickDoc = async () => {
+    const res = await DocumentPicker.getDocumentAsync({ copyToCacheDirectory: true });
+    if (!res.canceled && res.assets?.[0]) {
+      const a = res.assets[0];
+      setFiles((f) => [...f, { uri: a.uri, name: a.name, type: a.mimeType ?? "application/octet-stream" }]);
+    }
+  };
 
   const commentsQ = useQuery({ queryKey: ["comments", id], queryFn: () => api.comments.byTask(id) });
 
@@ -34,10 +52,12 @@ export default function TaskDetail() {
     mutationFn: async (content: string) => {
       const fd = new FormData();
       fd.append("content", content);
+      files.forEach((f) => fd.append("attachments", { uri: f.uri, name: f.name, type: f.type } as any));
       return api.comments.add(id, fd);
     },
     onSuccess: () => {
       setText("");
+      setFiles([]);
       qc.invalidateQueries({ queryKey: ["comments", id] });
     },
   });
@@ -118,12 +138,25 @@ export default function TaskDetail() {
       <Card>
         <H2>Add a comment</H2>
         <Field label="Comment" value={text} onChangeText={setText} placeholder="Write a comment…" multiline />
+        <View style={{ flexDirection: "row", gap: theme.spacing.sm }}>
+          <View style={{ flex: 1 }}>
+            <Button title="📷 Photo" variant="secondary" onPress={pickImage} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button title="📎 File" variant="secondary" onPress={pickDoc} />
+          </View>
+        </View>
+        {files.map((f, i) => (
+          <Body key={i} muted>
+            • {f.name}
+          </Body>
+        ))}
         {addComment.isError ? <ErrorText>Couldn't post comment.</ErrorText> : null}
         <Button
           title="Post comment"
-          onPress={() => text.trim() && addComment.mutate(text.trim())}
+          onPress={() => (text.trim() || files.length) && addComment.mutate(text.trim())}
           loading={addComment.isPending}
-          disabled={!text.trim()}
+          disabled={!text.trim() && files.length === 0}
         />
       </Card>
 
